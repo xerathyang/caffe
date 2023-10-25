@@ -304,13 +304,14 @@ namespace caffe
 //                              .setOperationGraph(op_graph)
 //                              .setHeurMode(CUDNN_HEUR_MODE_INSTANT)
 //                              .build();
-//        auto& filtered_configs = heuristics.getEngineConfig(heuristics.getEngineConfigCount());、
+//        auto& filtered_configs = heuristics.getEngineConfig(heuristics.getEngineConfigCount());
 
     cudnn_frontend::ExecutionPlan
-        get_execution_plan(cudnn_frontend::OperationGraph &op_graph, udnnHandle_t handle){
+        get_execution_plan(cudnn_frontend::OperationGraph &&op_graph, cudnnHandle_t handle){
 
         cudnn_frontend::EngineConfigList filtered_configs;
-        auto statuses = cudnn_frontend::get_heuristics_list<2>({"heuristics_instant", "heuristics_fallback"}, op_graph, isNonDeterministic, filtered_configs);
+        auto statuses = cudnn_frontend::get_heuristics_list<2>({"heuristics_instant", "heuristics_fallback"},
+                                                               op_graph, isNonDeterministic, filtered_configs);
 
         /***    cudnn frontend example code
         // test change start
