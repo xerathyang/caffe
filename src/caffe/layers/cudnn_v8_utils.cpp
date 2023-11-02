@@ -295,7 +295,7 @@ namespace caffe
         }
     }
 
-//    original code     //
+//    //    original code     //
 //    cudnn_frontend::ExecutionPlan
 //    get_execution_plan(cudnn_frontend::OperationGraph &&op_graph,
 //                       cudnnHandle_t handle)
@@ -306,7 +306,7 @@ namespace caffe
 //                              .build();
 //        auto& filtered_configs = heuristics.getEngineConfig(heuristics.getEngineConfigCount());
 
-    cudnn_frontend::ExecutionPlan
+        cudnn_frontend::ExecutionPlan
         get_execution_plan(cudnn_frontend::OperationGraph &&op_graph, cudnnHandle_t handle){
 
         cudnn_frontend::EngineConfigList filtered_configs;
@@ -329,6 +329,7 @@ namespace caffe
                 std::cout << "Filter config list has " << filtered_configs.size() << " configurations " << std::endl;
         // test change end
         ***/
+
         bool plan_found = false;
         for (auto &filtered_config : filtered_configs)
         {
@@ -339,11 +340,14 @@ namespace caffe
                                 .setEngineConfig(filtered_config, op_graph.getTag())
                                 .build();
                 plan_found = true;
+//                auto workspace_size = plan.getWorkspaceSize();
+//                std::cout << "Plan tag: " << plan.getTag() << std::endl;
+//                std::cout << plan.describe() << " requires workspace " << workspace_size << std::endl;
                 return plan;
             }
             catch (cudnn_frontend::cudnnException &e)
             {
-                std::cout << "cudnnException " << e.what() << std::endl;
+//                std::cout << "cudnnException " << e.what() << std::endl;
                 continue;
             }
         }
