@@ -66,6 +66,7 @@ if(USE_libstdcpp)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libstdc++")
   message("-- Warning: forcing libstdc++ (controlled by USE_libstdcpp option in cmake)")
 endif()
+message("-- Warning: forcing libstdc++ (controlled by USE_libstdcpp option in cmake)")
 
 # ---[ Warnings
 caffe_warnings_disable(CMAKE_CXX_FLAGS -Wno-sign-compare -Wno-uninitialized)

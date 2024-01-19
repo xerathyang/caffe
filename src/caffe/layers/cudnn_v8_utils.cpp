@@ -295,14 +295,41 @@ namespace caffe
         }
     }
 
-    cudnn_frontend::ExecutionPlan
-    get_execution_plan(cudnn_frontend::OperationGraph &op_graph,
-                       cudnnHandle_t handle)
-    {
+//    //    original code     //
+//    cudnn_frontend::ExecutionPlan
+//    get_execution_plan(cudnn_frontend::OperationGraph &&op_graph,
+//                       cudnnHandle_t handle)
+//    {
+//        auto heuristics = cudnn_frontend::EngineHeuristicsBuilder()
+//                              .setOperationGraph(op_graph)
+//                              .setHeurMode(CUDNN_HEUR_MODE_INSTANT)
+//                              .build();
+//        auto& filtered_configs = heuristics.getEngineConfig(heuristics.getEngineConfigCount());
+
+        cudnn_frontend::ExecutionPlan
+        get_execution_plan(cudnn_frontend::OperationGraph &&op_graph, cudnnHandle_t handle){
+
         cudnn_frontend::EngineConfigList filtered_configs;
-        auto statuses = cudnn_frontend::get_heuristics_list<2>(
-            {"heuristics_instant", "heuristics_fallback"},
-            op_graph, isNonDeterministic, filtered_configs);
+        auto statuses = cudnn_frontend::get_heuristics_list<2>({"heuristics_instant", "heuristics_fallback"},
+                                                               op_graph, isNonDeterministic, filtered_configs);
+
+        /***    cudnn frontend example code
+        // test change start
+            cudnn_frontend::EngineConfigList filtered_configs;
+                auto statuses =
+                    cudnn_frontend::get_heuristics_list<2>({"heuristics_instant"
+                        , "heuristics_fallback"
+                    }, op_graph, ::isNonDeterministic, filtered_configs);
+
+                std::cout << "get_heuristics_list Statuses: ";
+                for (size_t i = 0 ; i < statuses.size(); i++) {
+                    std::cout << cudnn_frontend::to_string(statuses[i]) << " ";
+                }
+                std::cout << std::endl;
+                std::cout << "Filter config list has " << filtered_configs.size() << " configurations " << std::endl;
+        // test change end
+        ***/
+
         bool plan_found = false;
         for (auto &filtered_config : filtered_configs)
         {
@@ -313,11 +340,14 @@ namespace caffe
                                 .setEngineConfig(filtered_config, op_graph.getTag())
                                 .build();
                 plan_found = true;
+//                auto workspace_size = plan.getWorkspaceSize();
+//                std::cout << "Plan tag: " << plan.getTag() << std::endl;
+//                std::cout << plan.describe() << " requires workspace " << workspace_size << std::endl;
                 return plan;
             }
             catch (cudnn_frontend::cudnnException &e)
             {
-                std::cout << "cudnnException " << e.what() << std::endl;
+//                std::cout << "cudnnException " << e.what() << std::endl;
                 continue;
             }
         }
